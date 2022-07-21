@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -12,6 +11,7 @@ import 'package:routinechecker/src/core/utils/spacer.dart';
 import 'package:routinechecker/src/core/utils/validators.dart';
 import 'package:routinechecker/src/data/models/routine_model.dart';
 import 'package:routinechecker/src/presentation/widgets/app/cb_scaffold.dart';
+import 'package:routinechecker/src/presentation/widgets/appbars/app_bar.dart';
 import 'package:routinechecker/src/presentation/widgets/buttons/theme_button.dart';
 import 'package:routinechecker/src/presentation/widgets/textfields/dropdown.dart';
 import 'package:routinechecker/src/presentation/widgets/textfields/textfield.dart';
@@ -32,6 +32,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
   @override
   void initState() {
     super.initState();
+    setValues();
   }
 
   setValues() {
@@ -44,43 +45,95 @@ class _DetailsScreenState extends State<DetailsScreen> {
   @override
   Widget build(BuildContext context) {
     var routineState = useProvider(routineProvider);
-
     return CbScaffold(
-      backgroundColor: CbColors.cBase,
+      backgroundColor: CbColors.white,
       body: SingleChildScrollView(
         child: Form(
           key: _formkey,
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(
-                'You have ${widget.item.time} ${getFreq(widget.item.frequency ?? 'Hourly')} more to the next routine check',
-                style: CbTextStyle.book12),
-            CbTextField(
-                hint: 'Enter title',
-                controller: titleController,
-                label: 'Title',
-                validator: Validators.validateField),
-            YMargin(10),
-            CbDropDown(
-              options: ['Hourly', 'Daily', 'Weekly', 'Monthly', ''],
-              label: 'Select Frequency',
-              enabled: false,
-              selected: widget.item.frequency?.capitalizeFirst,
-              onChanged: null,
-              hint: 'Select Frequency',
-            ),
-            CbTextField(
-              hint: 'Ente timeframe',
-              controller: TextEditingController(text: widget.item.time),
-              enabled: false,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              validator: Validators.validateEmail,
-              label: 'Time',
-            ),
-            YMargin(36),
-          ]),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              YMargin(40),
+              if (widget.item.frequency == 'hourly')
+                Text(
+                    'You have ${widget.item.time} ${getFreq(widget.item.frequency ?? 'Hourly')} more to the next routine check',
+                    style: CbTextStyle.book12)
+              else
+                Text(
+                    'You have ${widget.item.time} ${getFreq(widget.item.frequency ?? 'Hourly')} more to the next routine check',
+                    style: CbTextStyle.book12),
+              YMargin(14),
+              CbTextField(
+                  hint: 'Enter title',
+                  controller: titleController,
+                  label: 'Title',
+                  validator: Validators.validateField),
+              YMargin(14),
+              CbDropDown(
+                options: ['Hourly', 'Daily', 'Weekly', 'Monthly', ''],
+                label: 'Select Frequency',
+                enabled: false,
+                selected: widget.item.frequency?.capitalizeFirst,
+                onChanged: null,
+                hint: 'Select Frequency',
+              ),
+              YMargin(14),
+              CbTextField(
+                hint: 'Enter timeframe',
+                controller: TextEditingController(text: widget.item.time),
+                enabled: false,
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                validator: Validators.validateField,
+                label: 'Time',
+              ),
+              YMargin(14),
+              CbTextField(
+                maxLines: 4,
+                hint: 'Enter description',
+                controller: descController,
+                validator: Validators.validateField,
+                label: 'Time',
+              ),
+              YMargin(36),
+            ]),
+          ),
         ),
+      ),
+      appBar: CbAppBar(
+        title: 'Update Routine.',
+        actions: [
+          IconButton(
+            icon: Padding(
+              padding: const EdgeInsets.only(top:28.0),
+              child: Icon(Icons.delete),
+            ),
+            onPressed: () {
+              showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                        title: Text('Delete Routine'),
+                        content: Text(
+                            'Are you sure you want to delete this routine?'),
+                        actions: [
+                          FlatButton(
+                            child: Text('Cancel'),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                          FlatButton(
+                            child: Text('Delete'),
+                            onPressed: () {
+                              routineState.deleteRoutine(widget.item);
+
+                              Navigator.pop(context);
+                            },
+                          )
+                        ],
+                      ));
+            },
+          )
+        ],
       ),
       persistentFooterButtons: [
         Padding(
@@ -88,8 +141,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('* Note: All routines expire in 15 mins',
-                  style: CbTextStyle.error),
               CbThemeButton(
                 text: 'Update',
                 loadingState: routineState.stateBusy,
@@ -104,9 +155,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                       title: titleController.text,
                       description: descController.text,
                       frequency: widget.item.frequency,
-                      id: widget.item.id,
+                      // id: widget.item.id,
                     ),
-                    widget.item.id!,
+                    // widget.item.id!,
                   );
                 },
               ),
@@ -120,22 +171,21 @@ class _DetailsScreenState extends State<DetailsScreen> {
   String? getFreq(String value) {
     switch (value) {
       case 'Hourly':
-        'hour(s)';
-        break;
+        return 'hour(s)';
       case 'Daily':
-        'day(s)';
-        break;
+        return 'day(s)';
+
       case 'Weekly':
-        'week(s)';
-        break;
+        return 'week(s)';
+
       case 'Monthly':
-        'month(s)';
-        break;
+        return 'month(s)';
+
       case 'Yearly':
-        'year(s)';
-        break;
+        return 'year(s)';
+
       default:
-        'hour(s)';
+        return 'hour(s)';
     }
   }
 }

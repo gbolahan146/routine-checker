@@ -19,18 +19,15 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^1.0.0
-  pin_code_fields: ^7.0.0
+
   mime: ^1.0.0
   percent_indicator: ^3.0.1
   sqflite: ^2.0.1
 
   get: ^4.3.8
-  money_formatter: ^0.0.3
-  flutter_dotenv: ^5.0.2
-  currency_text_input_formatter: ^2.1.5
   flutter_svg: ^0.21.0+1
   fluttertoast: ^8.0.8
-  http_parser: ^4.0.0
+
   flutter_riverpod: ^0.14.0+3
   hooks_riverpod: ^0.14.0+5
   pull_to_refresh: ^2.0.0
@@ -43,7 +40,6 @@ dev_dependencies:
   flutter_local_notifications: ^9.1.4
   hive: ^2.0.4
   image_picker: ^0.8.4+1
-  dotenv: ^3.0.0
   share: ^2.0.4
   dio: ^4.0.0
   logger: ^1.1.0
@@ -52,6 +48,9 @@ dev_dependencies:
 
   shared_preferences: ^2.0.7
   loading_overlay: ^0.3.0
+
+
+
 
 flutter:
 

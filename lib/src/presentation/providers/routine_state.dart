@@ -39,12 +39,13 @@ class RoutineState extends ChangeNotifier {
   }
 
   fetchUserDetails() async {
-    _userEmail = await LocalStorage.getItem("userEmail");
-    _userName = await LocalStorage.getItem("name");
+    _userEmail = await LocalStorage.getItem("userEmail") ?? '';
+    _userName = await LocalStorage.getItem("name") ?? '';
     notifyListeners();
   }
 
   Future<List<RoutineModel>> fetchRoutines() async {
+    print('fetching');
     var records = await db.rawQuery('SELECT * from $tableName');
     var items = records.map((e) => RoutineModel.fromMap(e)).toList();
     var tempList = List<RoutineModel>.from(items.reversed);
@@ -54,40 +55,54 @@ class RoutineState extends ChangeNotifier {
     return listOfRoutines;
   }
 
+  calculatePerformance() {
+    var lengthOfCompletedRoutines =
+        listOfRoutines.where((e) => e.status == 'Done').length;
+    var lengthOfMissedRoutines =
+        listOfRoutines.where((e) => e.status == 'Expired').length;
+  }
+
   Future<List<RoutineModel>> fetchUnder12Routines() async {
     var records = await db.rawQuery('SELECT * from $tableName');
     var items = records.map((e) => RoutineModel.fromMap(e)).toList();
     var tempList = List<RoutineModel>.from(items.reversed);
-    // final Duration durdef = DateTime.now().difference(Dur);
-    // print("${durdef.inHours} Hours");
 
     for (var i = 0; i < tempList.length; i++) {
       Jiffy((DateTime.parse(tempList[i].createdAt)))
           .startOf(Units.HOUR)
           .fromNow();
-      if ((tempList[i].frequency == 'Hourly' ||
-              tempList[i].frequency == 'Daily') &&
-          (TimeOfDay.fromDateTime((DateTime.parse(tempList[i].createdAt)))
-                      .hourOfPeriod *
-                  num.parse(tempList[i].time ?? '0') <
-              12)) {
+      if (num.parse(tempList[i].time ?? '0') < 12) {
         listOfRoutines12.add(tempList[i]);
       }
+
+      // if ((tempList[i].frequency == 'hourly' ||
+      //         tempList[i].frequency == 'daily') &&
+      //     (TimeOfDay.fromDateTime((DateTime.parse(tempList[i].createdAt)))
+      //                 .hourOfPeriod *
+      //             num.parse(tempList[i].time ?? '0') <
+      //         12)) {
+      //   listOfRoutines12.add(tempList[i]);
+      // }
     }
     listOfRoutines12.sort((b, a) => b.createdAt.compareTo(a.createdAt));
     notifyListeners();
     return listOfRoutines12;
   }
 
-  Future<RoutineModel?> createNewRoutine(RoutineModel routineModel) async {
+  Future<RoutineModel?> createNewRoutine(RoutineModel routineModel,
+      {Function()? onSuccess}) async {
     try {
+      print(routineModel.toMap());
       _stateBusy = true;
-      Future.delayed(Duration(seconds: 2), () {});
+      notifyListeners();
+      Future.delayed(Duration(seconds: 3), () {});
       var records = await db.rawQuery('SELECT * from $tableName');
-      var listOfRecords = records.map((e) => RoutineModel.fromMap(e)).toList();
+      print(records);
 
+      var listOfRecords = records.map((e) => RoutineModel.fromMap(e)).toList();
+      print(listOfRecords);
       var existingItem = listOfRecords
-          .firstWhereOrNull((element) => element.id == routineModel.id);
+          .firstWhereOrNull((element) => element.title == routineModel.title);
 
       if (existingItem == null) {
         await db.insert(
@@ -97,12 +112,19 @@ class RoutineState extends ChangeNotifier {
         );
         logger.d("item inserted");
       }
+      print('g');
       showSuccessToast(message: 'Routine Created Successfully ');
 
-      NotificationService.sendPeriodNotification();
+      // NotificationService.sendPeriodNotification();
+      NotificationService.showNotifications(
+          title: 'Upcoming routine', message: '${routineModel.title} ');
       fetchRoutines();
+      fetchUnder12Routines();
+      onSuccess?.call();
       return routineModel;
-    } catch (e) {
+    } catch (e, s) {
+      print(e);
+      print(s);
       return null;
     } finally {
       _stateBusy = false;
@@ -110,21 +132,31 @@ class RoutineState extends ChangeNotifier {
     }
   }
 
-  Future<int> updateRoutine(RoutineModel routineModel, String id) async {
+  Future<int> updateRoutine(
+    RoutineModel routineModel,
+  ) async {
+    print(
+      routineModel.toMap(),
+    );
     int count = await db.update(tableName, routineModel.toMap(),
-        where: 'id = $id', whereArgs: [routineModel.title]);
+        where: 'routineid = ${routineModel.routineId}',
+        whereArgs: [routineModel.routineId]);
 
     fetchRoutines();
+    fetchUnder12Routines();
     showSuccessToast(message: 'Routine Updated Successfully ');
 
     return count;
   }
 
-  Future<int> deleteRoutine(RoutineModel routineModel, int id) async {
-    int count = await db
-        .delete(tableName, where: 'id = $id', whereArgs: [routineModel.title]);
+  Future<int> deleteRoutine(RoutineModel routineModel) async {
+    int count = await db.delete(tableName,
+        where: 'routineId = ${routineModel.routineId}',
+        whereArgs: [routineModel.routineId]);
     showSuccessToast(message: 'Routine Deleted Successfully ');
     fetchRoutines();
+    fetchUnder12Routines();
+
     return count;
   }
 

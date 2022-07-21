@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:routinechecker/src/core/utils/navigator.dart';
+import 'package:routinechecker/src/data/datasources/local/local_db.dart';
 import 'package:routinechecker/src/data/models/routine_model.dart';
 import 'package:routinechecker/src/presentation/providers/notification_service.dart';
 import 'package:routinechecker/src/presentation/views/homescreen/create_routine.dart';
+import 'package:routinechecker/src/presentation/views/routinedetails/details_screen.dart';
 import 'package:routinechecker/src/presentation/widgets/buttons/theme_button.dart';
 import 'package:share/share.dart';
 import 'package:percent_indicator/percent_indicator.dart';
@@ -22,6 +25,8 @@ class HomePage extends StatefulHookWidget {
 
 class _HomePageState extends State<HomePage> {
   bool obscureText = false;
+  LocalDB localDB = LocalDB();
+
   String greeting() {
     var hour = DateTime.now().hour;
     if (hour < 12) {
@@ -49,6 +54,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     context.read(routineProvider).fetchUserDetails();
+    context.read(routineProvider).load(localDB.database);
   }
 
   @override
@@ -78,34 +84,47 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             children: [
               YMargin(60),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Good ${greeting()} ${greetingIcon()}",
-                        style: CbTextStyle.book14,
-                      ),
-                      Text(
-                        "${routineState.userName}.",
-                        style: CbTextStyle.bold24,
-                      ),
-                    ],
-                  ),
-                  Icon(Icons.notifications_none)
-                ],
+              GestureDetector(
+                onTap: () {
+                  NotificationService.showNotifications();
+                  // routineState.fetchRoutines();
+                  routineState.fetchUnder12Routines();
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Good ${greeting()} ${greetingIcon()}",
+                          style: CbTextStyle.book14,
+                        ),
+                        Text(
+                          "${routineState.userName}.",
+                          style: CbTextStyle.bold24,
+                        ),
+                      ],
+                    ),
+                    Icon(Icons.notifications_none)
+                  ],
+                ),
               ),
               YMargin(24),
+              Center(
+                  child: Text('Routine Tracking', style: CbTextStyle.medium)),
+              YMargin(14),
               CircularPercentIndicator(
-                radius: 60.0,
+                radius: 120.0,
                 lineWidth: 10.0,
                 animation: true,
                 backgroundColor: Colors.grey,
                 circularStrokeCap: CircularStrokeCap.round,
-                percent: 100,
-                center: new Text("100%"),
+                percent: 1,
+                center: new Text(
+                  "100%",
+                  style: CbTextStyle.medium,
+                ),
                 progressColor: Colors.green,
               ),
               YMargin(24),
@@ -131,74 +150,92 @@ class _HomePageState extends State<HomePage> {
                         Text(
                           'Under 12 hours.',
                           style: CbTextStyle.medium.copyWith(
-                              fontSize: config.sp(14),
+                              fontSize: config.sp(12),
                               color: CbColors.cAccentLighten3),
                         ),
                         XMargin(8),
-                        Icon(Icons.date_range),
+                        Icon(Icons.date_range, size: 14),
                       ],
                     ),
                     YMargin(16),
-                    ListView.separated(
-                        // shrinkWrap: true,
-                        separatorBuilder: (context, index) => YMargin(16),
-                        itemCount: routineState.listOfRoutines12.length,
-                        itemBuilder: (context, index) {
-                          if (routineState.listOfRoutines12[index].status ==
-                              'Ongoing') {
-                            if (DateTime.now()
-                                    .difference(DateTime.parse(routineState
-                                        .listOfRoutines12[index].createdAt))
-                                    .inMinutes >
-                                15) {
-                              routineState.listOfRoutines12[index].status =
-                                  'Expired';
-                            }
-                          }
-                          if (DateTime.parse(routineState
-                                      .listOfRoutines12[index].createdAt)
-                                  .subtract(Duration(minutes: 5)) ==
-                              0) {
-                            routineState.sendEmailNotification(
-                                routineState.listOfRoutines12[index].title ??
+                    routineState.listOfRoutines12.isEmpty
+                        ? Center(
+                            child: Text(
+                              'No routines yet.',
+                              style: CbTextStyle.medium.copyWith(
+                                  fontSize: config.sp(14),
+                                  color: CbColors.cAccentLighten3),
+                            ),
+                          )
+                        : ListView.separated(
+                            shrinkWrap: true,
+                            separatorBuilder: (context, index) => YMargin(16),
+                            itemCount: routineState.listOfRoutines12.length,
+                            itemBuilder: (context, index) {
+                              if (routineState.listOfRoutines12[index].status ==
+                                  'Ongoing') {
+                                if (DateTime.now()
+                                        .difference(DateTime.parse(routineState
+                                            .listOfRoutines12[index].createdAt))
+                                        .inMinutes >
+                                    15) {
+                                  routineState.listOfRoutines12[index].status =
+                                      'Expired';
+                                  NotificationService.showNotifications(
+                                      title: 'Oops! Routine expired',
+                                      message:
+                                          'Routine ${routineState.listOfRoutines12[index].title} has expired');
+                                }
+                              }
+                              if (DateTime.parse(routineState
+                                          .listOfRoutines12[index].createdAt)
+                                      .subtract(Duration(minutes: 5)) ==
+                                  0) {
+                                routineState.sendEmailNotification(routineState
+                                        .listOfRoutines12[index].title ??
                                     '');
-                            NotificationService.showNotifications();
-                          }
-                          return Container(
-                            decoration: BoxDecoration(
-                                color: CbColors.white,
-                                borderRadius: BorderRadius.circular(4)),
-                            padding: EdgeInsets.all(16),
-                            child: Column(
-                              children: [
-                                Row(
+                                NotificationService.showNotifications();
+                              }
+                              return Container(
+                                decoration: BoxDecoration(
+                                    color: CbColors.white,
+                                    borderRadius: BorderRadius.circular(4)),
+                                padding: EdgeInsets.all(16),
+                                child: Column(
                                   children: [
-                                    routineState.listOfRoutines12[index]
-                                                .status ==
-                                            'Expired'
-                                        ? SizedBox()
-                                        : Checkbox(
-                                            checkColor: Colors.white,
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(4)),
-                                            activeColor: CbColors.cPrimaryBase,
-                                            value: routineState
-                                                    .listOfRoutines12[index]
+                                    Row(
+                                      children: [
+                                        routineState.listOfRoutines12[index]
                                                     .status ==
-                                                'Done',
-                                            onChanged: (val) {
-                                              if (routineState
-                                                      .listOfRoutines12[index]
-                                                      .status ==
-                                                  'Ongoing')
-                                                routineState.updateRoutine(
-                                                    RoutineModel(
+                                                'Expired'
+                                            ? Icon(Icons.error,
+                                                color: CbColors.cErrorBase)
+                                            : Checkbox(
+                                                checkColor: Colors.white,
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            4)),
+                                                activeColor:
+                                                    CbColors.cPrimaryBase,
+                                                value: routineState
+                                                        .listOfRoutines12[index]
+                                                        .status ==
+                                                    'Done',
+                                                onChanged: (val) {
+                                                  if (routineState
+                                                          .listOfRoutines12[
+                                                              index]
+                                                          .status ==
+                                                      'Ongoing')
+                                                    routineState.updateRoutine(
+                                                      RoutineModel(
                                                         createdAt: routineState
                                                             .listOfRoutines12[
                                                                 index]
                                                             .createdAt,
-                                                        updatedAt: DateTime.now()
+                                                        updatedAt: DateTime
+                                                                .now()
                                                             .toIso8601String(),
                                                         status: 'Done',
                                                         time: routineState
@@ -217,96 +254,120 @@ class _HomePageState extends State<HomePage> {
                                                             .listOfRoutines12[
                                                                 index]
                                                             .frequency,
-                                                        id: routineState
-                                                            .listOfRoutines12[
-                                                                index]
-                                                            .id),
-                                                    routineState
-                                                        .listOfRoutines12[index]
-                                                        .id!);
-                                            }),
-                                    XMargin(16),
-                                    Expanded(
-                                      child: Column(
-                                        children: [
-                                          Row(
+                                                        // id: routineState
+                                                        //     .listOfRoutines12[
+                                                        //         index]
+                                                        //     .id
+                                                      ),
+                                                    );
+                                                }),
+                                        XMargin(16),
+                                        Expanded(
+                                          child: Column(
                                             children: [
-                                              Text(
-                                                  '${routineState.listOfRoutines12[index].title}',
-                                                  style: CbTextStyle.medium),
-                                              Spacer(),
-                                              IconButton(
-                                                  icon: Icon(Icons.share),
-                                                  onPressed: () => Share.share(
-                                                        'Routine title: every ',
-                                                      ))
-                                            ],
-                                          ),
-                                          YMargin(4),
-                                          Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            children: [
-                                              Text(
-                                                  'Every ${routineState.listOfRoutines12[index].time} ${getFreq(routineState.listOfRoutines12[index].frequency ?? '')} ',
-                                                  style: CbTextStyle.book12),
-                                              Spacer(),
-                                              Text(
-                                                  '${routineState.listOfRoutines12[index].status}',
-                                                  style: CbTextStyle.book12
-                                                      .copyWith(
-                                                          color: routineState
-                                                                  .listOfRoutines12[
-                                                                      index]
-                                                                  .status!
-                                                                  .contains(
-                                                                      'Done')
-                                                              ? CbColors
-                                                                  .cSuccessBase
-                                                              : routineState
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                      '${routineState.listOfRoutines12[index].title}',
+                                                      style:
+                                                          CbTextStyle.medium),
+                                                  Spacer(),
+                                                  IconButton(
+                                                      icon: Icon(Icons.share,
+                                                          size: 20),
+                                                      onPressed: () =>
+                                                          Share.share(
+                                                            'Routine:${routineState.listOfRoutines12[index].title}',
+                                                          ))
+                                                ],
+                                              ),
+                                              YMargin(4),
+                                              Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.end,
+                                                children: [
+                                                  Text(
+                                                      'Every ${routineState.listOfRoutines12[index].time} ${getFreq(routineState.listOfRoutines12[index].frequency ?? '')} ',
+                                                      style:
+                                                          CbTextStyle.book12),
+                                                  XMargin(5),
+                                                  Text(
+                                                      '${routineState.listOfRoutines12[index].status}',
+                                                      style: CbTextStyle.book12
+                                                          .copyWith(
+                                                              color: routineState
                                                                       .listOfRoutines12[
                                                                           index]
                                                                       .status!
                                                                       .contains(
-                                                                          'Ongoing')
-                                                                  ? Colors
-                                                                      .orange
-                                                                  : CbColors
-                                                                      .cErrorBase)),
-                                              XMargin(8),
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    bottom: 1.0),
-                                                child: Icon(
-                                                    Icons.arrow_forward_ios,
-                                                    size: 10,
-                                                    color: routineState
-                                                            .listOfRoutines12[
-                                                                index]
-                                                            .status!
-                                                            .contains('Done')
-                                                        ? CbColors.cSuccessBase
-                                                        : routineState
-                                                                .listOfRoutines12[
-                                                                    index]
-                                                                .status!
-                                                                .contains(
-                                                                    'Ongoing')
-                                                            ? Colors.orange
-                                                            : CbColors
-                                                                .cErrorBase),
-                                              )
+                                                                          'Done')
+                                                                  ? CbColors
+                                                                      .cSuccessBase
+                                                                  : routineState
+                                                                          .listOfRoutines12[
+                                                                              index]
+                                                                          .status!
+                                                                          .contains(
+                                                                              'Ongoing')
+                                                                      ? Colors
+                                                                          .orange
+                                                                      : CbColors
+                                                                          .cErrorBase)),
+                                                  Spacer(),
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      navigate(DetailsScreen(
+                                                        item: routineState
+                                                                      .listOfRoutines12[index]
+                                                      ));
+                                                    },
+                                                    child: Row(
+                                                      children: [
+                                                        Text('View',
+                                                            style: CbTextStyle
+                                                                .book12),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .only(
+                                                                  bottom: 1.0),
+                                                          child: Icon(
+                                                              Icons
+                                                                  .arrow_forward_ios,
+                                                              size: 10,
+                                                              color: routineState
+                                                                      .listOfRoutines12[
+                                                                          index]
+                                                                      .status!
+                                                                      .contains(
+                                                                          'Done')
+                                                                  ? CbColors
+                                                                      .cSuccessBase
+                                                                  : routineState
+                                                                          .listOfRoutines12[
+                                                                              index]
+                                                                          .status!
+                                                                          .contains(
+                                                                              'Ongoing')
+                                                                      ? Colors
+                                                                          .orange
+                                                                      : CbColors
+                                                                          .cErrorBase),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
                                             ],
                                           ),
-                                        ],
-                                      ),
-                                    )
+                                        )
+                                      ],
+                                    ),
                                   ],
                                 ),
-                              ],
-                            ),
-                          );
-                        }),
+                              );
+                            }),
                     YMargin(16),
                   ],
                 ),

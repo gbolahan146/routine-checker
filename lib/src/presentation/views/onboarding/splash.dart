@@ -6,7 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:routinechecker/src/config/styles/colors.dart';
 import 'package:routinechecker/src/config/styles/textstyles.dart';
+import 'package:routinechecker/src/core/utils/dimensions.dart';
+import 'package:routinechecker/src/core/utils/navigator.dart';
 import 'package:routinechecker/src/data/datasources/local/local_storage.dart';
+import 'package:routinechecker/src/presentation/views/homescreen/home.dart';
 import 'package:routinechecker/src/presentation/views/onboarding/onboarding_page.dart';
 
 class SplashPage extends StatefulHookWidget {
@@ -29,7 +32,7 @@ class _SplashPageState extends State<SplashPage> {
     bool loggedinState = await LocalStorage.getItem("loggedIn") ?? false;
     print("loggedinState: $loggedinState");
     if (onboardingState != null && onboardingState) {
-      // navigateReplaceTo(context, LoginReturningPage());
+      navigateReplaceTo(context, HomePage());
     } else {
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
         return OnboardingPage();
@@ -39,6 +42,7 @@ class _SplashPageState extends State<SplashPage> {
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig config = SizeConfig();
     return Scaffold(
       backgroundColor: CbColors.cAccentBase,
       body: Column(
@@ -47,12 +51,11 @@ class _SplashPageState extends State<SplashPage> {
           Container(
               alignment: Alignment.center,
               child: CircleAvatar(
-                backgroundColor:Colors.white,
-                child: Center(
-                  child: Text(
-                    'RC',
-                    style: CbTextStyle.bold28.copyWith(color: Colors.black),
-                  ),
+                radius: 50,
+                backgroundColor: Colors.white,
+                child: Text(
+                  'RC',
+                  style: CbTextStyle.bold28.copyWith( fontSize: config.sp(50), color: Colors.black),
                 ),
               )),
         ],

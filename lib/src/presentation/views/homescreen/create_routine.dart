@@ -10,6 +10,7 @@ import 'package:routinechecker/src/core/utils/spacer.dart';
 import 'package:routinechecker/src/core/utils/validators.dart';
 import 'package:routinechecker/src/data/models/routine_model.dart';
 import 'package:routinechecker/src/presentation/widgets/app/cb_scaffold.dart';
+import 'package:routinechecker/src/presentation/widgets/appbars/app_bar.dart';
 import 'package:routinechecker/src/presentation/widgets/buttons/theme_button.dart';
 import 'package:routinechecker/src/presentation/widgets/textfields/dropdown.dart';
 import 'package:routinechecker/src/presentation/widgets/textfields/textfield.dart';
@@ -39,86 +40,102 @@ class _CreateRoutinePageState extends State<CreateRoutinePage> {
   var _rnd = Random();
   @override
   Widget build(BuildContext context) {
-
     var routineState = useProvider(routineProvider);
 
     return CbScaffold(
-      backgroundColor: CbColors.cBase,
+      backgroundColor: CbColors.white,
+      appBar: CbAppBar(
+        title: 'Create Routine.',
+      ),
       body: SingleChildScrollView(
         child: Form(
           key: _formkey,
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            CbTextField(
-                hint: 'Enter title',
-                controller: titleController,
-                label: 'Title',
-                validator: Validators.validateField),
-            YMargin(10),
-            CbDropDown(
-              options: ['Hourly', 'Daily', 'Weekly', 'Monthly', ''],
-              label: 'Select Frequency',
-              enabled: true,
-              selected:
-                  freqController.text.isEmpty ? null : freqController.text,
-              onChanged: (val) {
-                setState(() {
-                  freqController.text = val ?? '';
-                });
-              },
-              hint: 'Select Frequency',
-            ),
-            CbTextField(
-              hint: 'Enter timeframe',
-              controller: timeController,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              validator: Validators.validateEmail,
-              label: 'Time',
-            ),
-            YMargin(10),
-            Row(
-              children: [
-                Icon(Icons.info, color: Color(0xffE5861A)),
-                SizedBox(width: 13),
-                Expanded(
-                  child: RichText(
-                    text: TextSpan(
-                        text: '',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'Roboto',
-                            color: Colors.black,
-                            fontSize: 12),
-                        children: [
-                          TextSpan(
-                              text: 'Do ',
-                              style: TextStyle(
-                                  fontFamily: 'Graphik',
-                                  fontWeight: FontWeight.w400)),
-                          TextSpan(
-                              text: '${titleController.text}',
-                              style: TextStyle(
-                                  fontFamily: CbFonts.circular,
-                                  fontWeight: FontWeight.w600)),
-                          TextSpan(
-                              text: 'every',
-                              style: TextStyle(
-                                  fontFamily: 'Graphik',
-                                  fontWeight: FontWeight.w400)),
-                          TextSpan(
-                              text: ' ${timeController.text} ',
-                              style: TextStyle(
-                                  fontFamily: CbFonts.circular,
-                                  fontWeight: FontWeight.w600)),
-                        ]),
-                  ),
-                )
-              ],
-            ),
-         
-            YMargin(36),
-          ]),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              YMargin(40),
+              CbTextField(
+                  hint: 'Enter title',
+                  controller: titleController,
+                  label: 'Title',
+                  validator: Validators.validateField),
+              YMargin(14),
+              CbDropDown(
+                options: ['Hourly', 'Daily', 'Weekly', 'Monthly', ''],
+                label: 'Select Frequency',
+                enabled: true,
+                selected:
+                    freqController.text.isEmpty ? null : freqController.text,
+                onChanged: (val) {
+                  setState(() {
+                    freqController.text = val ?? '';
+                  });
+                },
+                hint: 'Select Frequency',
+              ),
+              YMargin(14),
+              CbTextField(
+                hint: 'Enter timeframe',
+                controller: timeController,
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                validator: Validators.validateField,
+                label: 'Time',
+              ),
+              YMargin(14),
+              CbTextField(
+                hint: 'Enter description',
+                controller: descController,
+                maxLines: 4,
+                validator: Validators.validateField,
+                label: 'Description',
+              ),
+              YMargin(14),
+              if (timeController.text != '')
+                Row(
+                  children: [
+                    Icon(Icons.info, color: Color(0xffE5861A)),
+                    SizedBox(width: 13),
+                    Expanded(
+                      child: RichText(
+                        text: TextSpan(
+                            text: '',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontFamily: 'Roboto',
+                                color: Colors.black,
+                                fontSize: 12),
+                            children: [
+                              TextSpan(
+                                  text: 'Routine: ',
+                                  style: TextStyle(
+                                      fontFamily: 'Graphik',
+                                      fontWeight: FontWeight.w400)),
+                              TextSpan(
+                                  text: '${titleController.text}',
+                                  style: TextStyle(
+                                      fontFamily: CbFonts.circular,
+                                      fontWeight: FontWeight.w600)),
+                              TextSpan(
+                                  text: ' every',
+                                  style: TextStyle(
+                                      fontFamily: 'Graphik',
+                                      fontWeight: FontWeight.w400)),
+                              TextSpan(
+                                  text:
+                                      ' ${timeController.text} ${getFreq(freqController.text)} ',
+                                  style: TextStyle(
+                                      fontFamily: CbFonts.circular,
+                                      fontWeight: FontWeight.w600)),
+                            ]),
+                      ),
+                    )
+                  ],
+                ),
+              YMargin(36),
+            ]),
+          ),
         ),
       ),
       persistentFooterButtons: [
@@ -134,16 +151,20 @@ class _CreateRoutinePageState extends State<CreateRoutinePage> {
                 loadingState: routineState.stateBusy,
                 onPressed: () async {
                   if (!_formkey.currentState!.validate()) return;
-                  routineState.createNewRoutine(RoutineModel(
-                    createdAt: DateTime.now().toIso8601String(),
-                    updatedAt: DateTime.now().toIso8601String(),
-                    time: timeController.text,
-                    status: 'Ongoing',
-                    title: titleController.text,
-                    description: descController.text,
-                    frequency: freqController.text.toLowerCase(),
-                    id: getRandomString(15),
-                  ));
+                  routineState.createNewRoutine(
+                    RoutineModel(
+                      createdAt: DateTime.now().toIso8601String(),
+                      updatedAt: DateTime.now().toIso8601String(),
+                      time: timeController.text,
+                      status: 'Ongoing',
+                      routineId: getRandomString(15),
+                      title: titleController.text,
+                      description: descController.text,
+                      frequency: freqController.text.toLowerCase(),
+                      // id: getRandomString(15),
+                    ),
+                    onSuccess: () => Navigator.pop(context),
+                  );
                 },
               ),
             ],
@@ -160,21 +181,20 @@ class _CreateRoutinePageState extends State<CreateRoutinePage> {
 String? getFreq(String value) {
   switch (value) {
     case 'Hourly':
-      'hour(s)';
-      break;
+      return 'hour(s)';
     case 'Daily':
-      'day(s)';
-      break;
+      return 'day(s)';
+
     case 'Weekly':
-      'week(s)';
-      break;
+      return 'week(s)';
+
     case 'Monthly':
-      'month(s)';
-      break;
+      return 'month(s)';
+
     case 'Yearly':
-      'year(s)';
-      break;
+      return 'year(s)';
+
     default:
-      'hour(s)';
+      return 'hour(s)';
   }
 }

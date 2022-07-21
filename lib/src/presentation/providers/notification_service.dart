@@ -79,13 +79,13 @@ class NotificationService {
           subtitle: '',
           threadIdentifier: '');
 
-  static Future<void> showNotifications() async {
+  static Future<void> showNotifications({String? message, String? title}) async {
     NotificationDetails platformChannelSpecifics = NotificationDetails(
         android: _androidNotificationDetails, iOS: _iosNotificationDetails);
     await flutterLocalNotificationsPlugin.show(
       0,
-      'Notification Title',
-      'This is the Notification Body',
+     title?? 'Notification Title',
+   message??   'This is the Notification Body',
       platformChannelSpecifics,
       payload: 'Notification Payload',
     );

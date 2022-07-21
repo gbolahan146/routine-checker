@@ -1,34 +1,41 @@
 {
   "project_info": {
-    "project_number": "1027176159265",
-    "project_id": "routinecheck-77281",
-    "storage_bucket": "routinecheck-77281.appspot.com"
+    "project_number": "294144696316",
+    "project_id": "routinechecker-e7027",
+    "storage_bucket": "routinechecker-e7027.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1027176159265:android:647d45de3ca72180ae2b60",
+        "mobilesdk_app_id": "1:294144696316:android:a6afe3a114996052d95c79",
         "android_client_info": {
           "package_name": "com.routinechecker.routinechecker"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1027176159265-8jm5463mthtgv3v2fhk78bb9ibrung0c.apps.googleusercontent.com",
+          "client_id": "294144696316-4dc5ddegc396m4dvjgq2n0cecnpgpno7.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAfzxzt7YnyY7EbORi1aluVZUcXesnakqQ"
+          "current_key": "AIzaSyA3ysE7BQvWiDSa356dPqqtrmuUpFPyuEU"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "1027176159265-8jm5463mthtgv3v2fhk78bb9ibrung0c.apps.googleusercontent.com",
+              "client_id": "294144696316-4dc5ddegc396m4dvjgq2n0cecnpgpno7.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "294144696316-nh13b2ob1fvtpdm2uefhh75sbm21dl9f.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.routinechecker.routinechecker"
+              }
             }
           ]
         }

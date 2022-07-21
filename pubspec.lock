@@ -71,13 +71,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.5"
-  currency_text_input_formatter:
-    dependency: "direct dev"
-    description:
-      name: currency_text_input_formatter
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.1.7"
   dbus:
     dependency: transitive
     description:
@@ -92,13 +85,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.0.6"
-  dotenv:
-    dependency: "direct dev"
-    description:
-      name: dotenv
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "3.0.0"
   dotted_border:
     dependency: "direct dev"
     description:
@@ -153,13 +139,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_dotenv:
-    dependency: "direct dev"
-    description:
-      name: flutter_dotenv
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "5.0.2"
   flutter_hooks:
     dependency: transitive
     description:
@@ -304,7 +283,7 @@ packages:
     source: hosted
     version: "0.13.4"
   http_parser:
-    dependency: "direct dev"
+    dependency: transitive
     description:
       name: http_parser
       url: "https://pub.dartlang.org"
@@ -429,13 +408,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.2"
-  money_formatter:
-    dependency: "direct dev"
-    description:
-      name: money_formatter
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.0.3"
   path:
     dependency: transitive
     description:
@@ -527,13 +499,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.4.0"
-  pin_code_fields:
-    dependency: "direct dev"
-    description:
-      name: pin_code_fields
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "7.4.0"
   platform:
     dependency: transitive
     description:

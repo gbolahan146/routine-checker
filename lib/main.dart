@@ -5,9 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:hive/hive.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:routinechecker/src/config/themes/theme_config.dart';
 import 'package:routinechecker/src/core/utils/dimensions.dart';
+import 'package:routinechecker/src/data/datasources/local/local_db.dart';
 import 'package:routinechecker/src/presentation/views/onboarding/splash.dart';
 
 import 'src/presentation/providers/notification_service.dart';
@@ -22,6 +24,9 @@ void main() async {
   await NotificationService().init(); //
   await NotificationService().requestIOSPermissions; //
   await Hive.openBox("app_data");
+      LocalDB localDB = LocalDB();
+    await localDB.loadDb();
+    await Firebase.initializeApp();
   runApp(ProviderScope(child: MyApp()));
 }
 

@@ -26,14 +26,16 @@ class LocalDB {
   }
 
   void _onCreateDB(Database db, version) async {
-    // await db.execute('''CREATE TABLE recently_viewed (
-    //   id INTEGER PRIMARY KEY AUTOINCREMENT,
-    //   imageUrl TEXT NOT NULL,
-    //   title TEXT NOT NULL,
-    //   amount REAL NOT NULL,
-    //   rating REAL NOT NULL,
-    //   percentageDiscount INTEGER NOT NULL,
-    //   productID TEXT NOT NULL)''');
+    await db.execute('''CREATE TABLE routines (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      description TEXT NOT NULL,
+      title TEXT NOT NULL,
+      createdAt TEXT NOT NULL,
+      updatedAt TEXT NOT NULL,
+      time TEXT NOT NULL,
+      status TEXT NOT NULL,
+      routineId TEXT NOT NULL,
+      frequency TEXT NOT NULL)''');
 
     // await db.execute('''CREATE TABLE cart_db (
     //   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -51,7 +53,7 @@ class LocalDB {
 
   void deleteDb() async {
     var dbPath = await getDatabasesPath();
-    String fullPath = "$dbPath/twizll_local_db";
+    String fullPath = "$dbPath/routine_local_db";
     await deleteDatabase(fullPath);
   }
 }

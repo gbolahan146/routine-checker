@@ -1,12 +1,11 @@
 import 'dart:convert';
 
-
 class RoutineModel {
   String? description;
   String? title;
   String createdAt;
   String? updatedAt;
-  String? id;
+  String? routineId;
   String? time;
   String? status;
   String? frequency;
@@ -14,10 +13,10 @@ class RoutineModel {
   RoutineModel({
     this.description,
     this.title,
-    this.id,
+    this.routineId,
     this.frequency,
     this.status,
-   required this.createdAt,
+    required this.createdAt,
     this.time,
     this.updatedAt,
   });
@@ -29,7 +28,7 @@ class RoutineModel {
         createdAt: map['createdAt'],
         updatedAt: map['updatedAt'],
         time: map['time'],
-        id: map['id'],
+        routineId: map['routineId'],
         status: map['status'],
         frequency: map['frequency']);
   }
@@ -46,8 +45,8 @@ class RoutineModel {
       'createdAt': createdAt,
       'updatedAt': updatedAt,
       'time': time,
-      'status':status,
-      'id': id,
+      'status': status,
+      'routineId': routineId,
       'frequency': frequency
     };
   }
