@@ -1,0 +1,79 @@
+name: routinechecker
+description: A new Flutter project.
+
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.12.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^1.0.0
+  pin_code_fields: ^7.0.0
+  mime: ^1.0.0
+  percent_indicator: ^3.0.1
+  sqflite: ^2.0.1
+
+  get: ^4.3.8
+  money_formatter: ^0.0.3
+  flutter_dotenv: ^5.0.2
+  currency_text_input_formatter: ^2.1.5
+  flutter_svg: ^0.21.0+1
+  fluttertoast: ^8.0.8
+  http_parser: ^4.0.0
+  flutter_riverpod: ^0.14.0+3
+  hooks_riverpod: ^0.14.0+5
+  pull_to_refresh: ^2.0.0
+  google_sign_in: ^5.1.0
+  mailer: ^5.2.0
+  dotted_border: ^2.0.0+1
+  firebase_core: ^1.10.6
+
+  intl: ^0.17.0
+  flutter_local_notifications: ^9.1.4
+  hive: ^2.0.4
+  image_picker: ^0.8.4+1
+  dotenv: ^3.0.0
+  share: ^2.0.4
+  dio: ^4.0.0
+  logger: ^1.1.0
+  jiffy: ^5.0.0
+  path_provider: ^2.0.2
+
+  shared_preferences: ^2.0.7
+  loading_overlay: ^0.3.0
+
+flutter:
+
+
+  uses-material-design: true
+
+
+  assets:
+    - assets/images/
+    - assets/fonts/
+
+
+  fonts:
+    - family: CircularStd
+      fonts:
+        - asset: assets/fonts/CircularStd-Book.ttf
+          style: normal
+        - asset: assets/fonts/CircularStd-Book.ttf
+          weight: 400
+        - asset: assets/fonts/CircularStd-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/CircularStd-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/CircularStd-Black.ttf
+          weight: 900
