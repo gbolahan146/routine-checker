@@ -3,8 +3,10 @@
 A new Flutter project.
 
 ## Getting Started
+### using flutter version 2.5.3
 
-This project is a starting point for a Flutter application.
+
+This project is a test Routine Checker application.
 
 A few resources to get you started if this is your first Flutter project:
 
