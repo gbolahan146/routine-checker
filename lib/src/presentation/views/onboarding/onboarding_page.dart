@@ -3,7 +3,7 @@ import 'package:routinechecker/src/config/styles/colors.dart';
 import 'package:routinechecker/src/config/styles/textstyles.dart';
 import 'package:routinechecker/src/core/utils/helpers.dart';
 import 'package:routinechecker/src/core/utils/spacer.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+
 import 'package:routinechecker/src/core/utils/validators.dart';
 
 import 'package:routinechecker/src/data/datasources/local/local_storage.dart';

@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -7,9 +9,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:routinechecker/src/config/styles/colors.dart';
 import 'package:routinechecker/src/config/styles/textstyles.dart';
 import 'package:routinechecker/src/core/state_registry.dart';
+import 'package:routinechecker/src/core/utils/navigator.dart';
 import 'package:routinechecker/src/core/utils/spacer.dart';
 import 'package:routinechecker/src/core/utils/validators.dart';
 import 'package:routinechecker/src/data/models/routine_model.dart';
+import 'package:routinechecker/src/presentation/views/homescreen/home.dart';
 import 'package:routinechecker/src/presentation/widgets/app/cb_scaffold.dart';
 import 'package:routinechecker/src/presentation/widgets/appbars/app_bar.dart';
 import 'package:routinechecker/src/presentation/widgets/buttons/theme_button.dart';
@@ -106,7 +110,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
         actions: [
           IconButton(
             icon: Padding(
-              padding: const EdgeInsets.only(top:28.0),
+              padding: const EdgeInsets.only(top: 28.0),
               child: Icon(Icons.delete),
             ),
             onPressed: () {
@@ -123,10 +127,12 @@ class _DetailsScreenState extends State<DetailsScreen> {
                           ),
                           FlatButton(
                             child: Text('Delete'),
-                            onPressed: () {
-                              routineState.deleteRoutine(widget.item);
-
-                              Navigator.pop(context);
+                            onPressed: () { 
+                              routineState.deleteRoutine(widget.item,
+                                  onSuccess: () {
+                                pushUntil(context, HomePage());
+                              });
+                              // Navigator.pop(context);
                             },
                           )
                         ],
@@ -148,6 +154,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   if (!_formkey.currentState!.validate()) return;
                   routineState.updateRoutine(
                     RoutineModel(
+                      routineId: widget.item.routineId,
                       createdAt: widget.item.createdAt,
                       updatedAt: DateTime.now().toIso8601String(),
                       time: widget.item.time,
@@ -170,18 +177,18 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
   String? getFreq(String value) {
     switch (value) {
-      case 'Hourly':
+      case 'hourly':
         return 'hour(s)';
-      case 'Daily':
+      case 'daily':
         return 'day(s)';
 
-      case 'Weekly':
+      case 'weekly':
         return 'week(s)';
 
-      case 'Monthly':
+      case 'monthly':
         return 'month(s)';
 
-      case 'Yearly':
+      case 'yearly':
         return 'year(s)';
 
       default:

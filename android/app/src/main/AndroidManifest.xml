@@ -2,7 +2,7 @@
     package="com.routinechecker.routinechecker">
     <uses-permission android:name="android.permission.INTERNET"/>
    <application
-        android:label="routinechecker"
+        android:label="Routine Check"
         android:icon="@mipmap/app_icon">
         <activity
             android:name=".MainActivity"

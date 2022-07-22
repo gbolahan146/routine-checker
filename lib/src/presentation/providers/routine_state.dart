@@ -55,18 +55,22 @@ class RoutineState extends ChangeNotifier {
     return listOfRoutines;
   }
 
+  num computed = 1;
+
   calculatePerformance() {
     var lengthOfCompletedRoutines =
         listOfRoutines.where((e) => e.status == 'Done').length;
-    var lengthOfMissedRoutines =
-        listOfRoutines.where((e) => e.status == 'Expired').length;
+
+    computed = lengthOfCompletedRoutines / listOfRoutines.length;
+    computed = computed.abs();
+    notifyListeners();
   }
 
   Future<List<RoutineModel>> fetchUnder12Routines() async {
     var records = await db.rawQuery('SELECT * from $tableName');
     var items = records.map((e) => RoutineModel.fromMap(e)).toList();
     var tempList = List<RoutineModel>.from(items.reversed);
-
+    listOfRoutines12 = [];
     for (var i = 0; i < tempList.length; i++) {
       Jiffy((DateTime.parse(tempList[i].createdAt)))
           .startOf(Units.HOUR)
@@ -84,7 +88,8 @@ class RoutineState extends ChangeNotifier {
       //   listOfRoutines12.add(tempList[i]);
       // }
     }
-    listOfRoutines12.sort((b, a) => b.createdAt.compareTo(a.createdAt));
+    listOfRoutines12.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    calculatePerformance();
     notifyListeners();
     return listOfRoutines12;
   }
@@ -92,15 +97,12 @@ class RoutineState extends ChangeNotifier {
   Future<RoutineModel?> createNewRoutine(RoutineModel routineModel,
       {Function()? onSuccess}) async {
     try {
-      print(routineModel.toMap());
       _stateBusy = true;
       notifyListeners();
       Future.delayed(Duration(seconds: 3), () {});
       var records = await db.rawQuery('SELECT * from $tableName');
-      print(records);
 
       var listOfRecords = records.map((e) => RoutineModel.fromMap(e)).toList();
-      print(listOfRecords);
       var existingItem = listOfRecords
           .firstWhereOrNull((element) => element.title == routineModel.title);
 
@@ -112,7 +114,6 @@ class RoutineState extends ChangeNotifier {
         );
         logger.d("item inserted");
       }
-      print('g');
       showSuccessToast(message: 'Routine Created Successfully ');
 
       // NotificationService.sendPeriodNotification();
@@ -139,8 +140,7 @@ class RoutineState extends ChangeNotifier {
       routineModel.toMap(),
     );
     int count = await db.update(tableName, routineModel.toMap(),
-        where: 'routineid = ${routineModel.routineId}',
-        whereArgs: [routineModel.routineId]);
+        where: 'routineId = ?', whereArgs: [routineModel.routineId]);
 
     fetchRoutines();
     fetchUnder12Routines();
@@ -149,13 +149,13 @@ class RoutineState extends ChangeNotifier {
     return count;
   }
 
-  Future<int> deleteRoutine(RoutineModel routineModel) async {
+  Future<int> deleteRoutine(RoutineModel routineModel, {Function()? onSuccess}) async {
     int count = await db.delete(tableName,
-        where: 'routineId = ${routineModel.routineId}',
-        whereArgs: [routineModel.routineId]);
+        where: 'routineId = ?', whereArgs: [routineModel.routineId]);
     showSuccessToast(message: 'Routine Deleted Successfully ');
     fetchRoutines();
     fetchUnder12Routines();
+    onSuccess?.call();
 
     return count;
   }

@@ -12,6 +12,8 @@ buildscript {
     }
 }
 
+// aaptOptions { cruncherEnabled = false }
+
 allprojects {
     repositories {
         google()

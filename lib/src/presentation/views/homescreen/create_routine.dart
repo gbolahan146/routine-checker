@@ -45,6 +45,7 @@ class _CreateRoutinePageState extends State<CreateRoutinePage> {
     return CbScaffold(
       backgroundColor: CbColors.white,
       appBar: CbAppBar(
+   automaticallyImplyLeading: true,
         title: 'Create Routine.',
       ),
       body: SingleChildScrollView(
@@ -62,7 +63,7 @@ class _CreateRoutinePageState extends State<CreateRoutinePage> {
                   validator: Validators.validateField),
               YMargin(14),
               CbDropDown(
-                options: ['Hourly', 'Daily', 'Weekly', 'Monthly', ''],
+                options: ['Hourly', 'Daily', 'Weekly', 'Monthly', 'Yearly'],
                 label: 'Select Frequency',
                 enabled: true,
                 selected:
@@ -180,20 +181,16 @@ class _CreateRoutinePageState extends State<CreateRoutinePage> {
 
 String? getFreq(String value) {
   switch (value) {
-    case 'Hourly':
+    case 'hourly':
       return 'hour(s)';
-    case 'Daily':
+    case 'daily':
       return 'day(s)';
-
-    case 'Weekly':
+    case 'weekly':
       return 'week(s)';
-
-    case 'Monthly':
+    case 'monthly':
       return 'month(s)';
-
-    case 'Yearly':
+    case 'yearly':
       return 'year(s)';
-
     default:
       return 'hour(s)';
   }

@@ -120,9 +120,9 @@ class _HomePageState extends State<HomePage> {
                 animation: true,
                 backgroundColor: Colors.grey,
                 circularStrokeCap: CircularStrokeCap.round,
-                percent: 1,
+                percent: routineState.computed.toDouble(),
                 center: new Text(
-                  "100%",
+                  "${(routineState.computed.toDouble() * 100).toStringAsFixed(2)}%",
                   style: CbTextStyle.medium,
                 ),
                 progressColor: Colors.green,
@@ -169,6 +169,7 @@ class _HomePageState extends State<HomePage> {
                           )
                         : ListView.separated(
                             shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
                             separatorBuilder: (context, index) => YMargin(16),
                             itemCount: routineState.listOfRoutines12.length,
                             itemBuilder: (context, index) {
@@ -230,6 +231,10 @@ class _HomePageState extends State<HomePage> {
                                                       'Ongoing')
                                                     routineState.updateRoutine(
                                                       RoutineModel(
+                                                        routineId: routineState
+                                                            .listOfRoutines12[
+                                                                index]
+                                                            .routineId,
                                                         createdAt: routineState
                                                             .listOfRoutines12[
                                                                 index]
@@ -317,9 +322,9 @@ class _HomePageState extends State<HomePage> {
                                                   GestureDetector(
                                                     onTap: () {
                                                       navigate(DetailsScreen(
-                                                        item: routineState
-                                                                      .listOfRoutines12[index]
-                                                      ));
+                                                          item: routineState
+                                                                  .listOfRoutines12[
+                                                              index]));
                                                     },
                                                     child: Row(
                                                       children: [
