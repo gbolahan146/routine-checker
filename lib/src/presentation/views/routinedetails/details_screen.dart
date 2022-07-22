@@ -68,6 +68,16 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     'You have ${widget.item.time} ${getFreq(widget.item.frequency ?? 'Hourly')} more to the next routine check',
                     style: CbTextStyle.book12),
               YMargin(14),
+              if (widget.item == 'Ongoing')
+                Text('You have 50% check rate for this routine check',
+                    style: CbTextStyle.book12)
+              else if (widget.item == 'Done')
+                Text('You have over 70% check rate for this routine check',
+                    style: CbTextStyle.book12)
+              else
+                Text('You have less than 50% check rate for this routine check',
+                    style: CbTextStyle.book12),
+              YMargin(14),
               CbTextField(
                   hint: 'Enter title',
                   controller: titleController,
@@ -127,7 +137,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                           ),
                           FlatButton(
                             child: Text('Delete'),
-                            onPressed: () { 
+                            onPressed: () {
                               routineState.deleteRoutine(widget.item,
                                   onSuccess: () {
                                 pushUntil(context, HomePage());

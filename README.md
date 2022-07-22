@@ -4,6 +4,7 @@ A new Flutter project.
 
 ## Getting Started
 ### using flutter version 2.5.3
+### apk file can be found in root directory
 
 
 This project is a test Routine Checker application.

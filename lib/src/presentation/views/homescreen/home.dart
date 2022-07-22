@@ -127,6 +127,14 @@ class _HomePageState extends State<HomePage> {
                 ),
                 progressColor: Colors.green,
               ),
+              YMargin(10),
+              Center(
+                child: Text(
+                  'Ratio of total routines to completed',
+                  style: CbTextStyle.medium.copyWith(
+                      fontSize: config.sp(12), color: CbColors.cAccentLighten3),
+                ),
+              ),
               YMargin(24),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 16),
